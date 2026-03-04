@@ -1,0 +1,859 @@
+GOGHMAT KARAK CODE
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جغمة كرك | GOGHMAT KARAK - الخابورة، عمان</title>
+    <meta name="description" content="جغمة كرك - مقهى كرك عماني أصيل في الخابورة، شمال الباطنة. طلب مسبق وتوصيل وبوكسات مخصصة">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fefce8', 100: '#fef9c3', 200: '#fef08a',
+                            300: '#fde047', 400: '#facc15', 500: '#eab308',
+                            600: '#ca8a04', 700: '#a16207', 800: '#854d0e', 900: '#713f12',
+                        },
+                        oman: { red: '#C8102E', green: '#009739', white: '#FFFFFF' },
+                        dark: { 900: '#0a0a0a', 800: '#171717', 700: '#262626' },
+                        delivery: { 50: '#fef2f2', 100: '#fee2e2', 500: '#ef4444', 600: '#dc2626' },
+                        pickup: { 50: '#f0fdf4', 100: '#dcfce7', 500: '#22c55e', 600: '#16a34a' }
+                    },
+                    fontFamily: { sans: ['Tajawal', 'system-ui', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #fafafa; }
+        .pattern-bg { background-image: radial-gradient(circle at 1px 1px, rgba(234, 179, 8, 0.1) 1px, transparent 0); background-size: 20px 20px; }
+        .slide-up { animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .pulse-ring { animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+        @keyframes pulse-ring { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(234, 179, 8, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); } }
+        .btn-gold { background: linear-gradient(135deg, #facc15 0%, #eab308 100%); color: #0a0a0a; font-weight: 800; transition: all 0.3s; }
+        .btn-gold:hover { background: linear-gradient(135deg, #fde047 0%, #facc15 100%); transform: scale(1.02); box-shadow: 0 10px 30px -5px rgba(234, 179, 8, 0.4); }
+        .btn-dark { background: #0a0a0a; color: #facc15; font-weight: 700; transition: all 0.3s; }
+        .btn-dark:hover { background: #262626; transform: scale(1.02); }
+        .btn-delivery { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; font-weight: 800; }
+        .btn-pickup { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; font-weight: 800; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #eab308; border-radius: 4px; }
+        .admin-only { display: none; }
+        body.is-admin .admin-only { display: block; }
+        body.is-admin .admin-only-flex { display: flex; }
+        .map-container { position: relative; overflow: hidden; border-radius: 1rem; }
+        .map-container iframe { width: 100%; height: 100%; border: 0; }
+        .delivery-zone { fill: rgba(239, 68, 68, 0.2); stroke: #ef4444; stroke-width: 2; }
+        .address-card { transition: all 0.3s; border: 2px solid transparent; }
+        .address-card:hover { border-color: #eab308; transform: translateY(-2px); }
+        .address-card.selected { border-color: #22c55e; background: #f0fdf4; }
+        .progress-step { transition: all 0.3s; }
+        .progress-step.active { background: #eab308; color: #0a0a0a; }
+        .progress-step.completed { background: #22c55e; color: white; }
+        .tracking-line { background: linear-gradient(to right, #22c55e 50%, #e5e7eb 50%); }
+    </style>
+</head>
+<body class="text-dark-900 pattern-bg">
+
+    <!-- شريط الحالة العلوي -->
+    <div id="statusBar" class="fixed top-0 w-full z-50 bg-dark-900 text-brand-400 text-center py-2 text-sm font-bold border-b-2 border-brand-400">
+        <i class="fas fa-map-marker-alt ml-2"></i> سلطنة عمان - شمال الباطنة - ولاية الخابورة - منطقة السرحات - مقابل مركز الشرطة
+        <span class="mx-2 text-brand-600">|</span> 
+        <i class="fas fa-phone ml-2"></i> 77055754 / 96959420
+    </div>
+
+    <!-- الهيدر -->
+    <header class="fixed top-9 w-full bg-white/95 backdrop-blur border-b border-brand-200 z-40">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-brand-400 rounded-full flex items-center justify-center overflow-hidden border-2 border-dark-900 shadow-lg">
+                    <img src="/mnt/kimi/upload/0B5DDF1E-04CE-46BE-BE80-87DAFF477D7F.jpg" alt="جغمة كرك" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <h1 class="font-black text-xl leading-tight text-dark-900">جغمة كرك</h1>
+                    <p class="text-xs text-brand-600 font-bold">الخابورة - السرحات 🇴🇲</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button onclick="showPoints()" class="hidden md:flex items-center gap-2 bg-brand-100 text-brand-800 px-4 py-2 rounded-full text-sm font-bold border border-brand-300">
+                    <i class="fas fa-coins text-brand-600"></i>
+                    <span id="userPoints">125</span> نقطة
+                </button>
+                <button onclick="toggleCart()" class="relative p-2 hover:bg-brand-100 rounded-full transition">
+                    <i class="fas fa-shopping-bag text-xl text-dark-900"></i>
+                    <span id="cartBadge" class="absolute -top-1 -right-1 bg-brand-500 text-dark-900 text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-white">0</span>
+                </button>
+                <button onclick="toggleProfile()" class="w-10 h-10 rounded-full bg-dark-900 text-brand-400 flex items-center justify-center border-2 border-brand-400">
+                    <i class="fas fa-user"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="pt-28 pb-24 container mx-auto px-4 max-w-2xl">
+
+        <!-- بطاقة المستخدم -->
+        <div class="bg-dark-900 rounded-3xl p-6 text-brand-400 mb-6 shadow-xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-brand-400 opacity-10 rounded-full -mr-10 -mt-10"></div>
+            <div class="relative z-10">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-sm opacity-80 mb-1">مرحباً، أحمد</p>
+                        <h2 class="text-2xl font-black flex items-center gap-2">
+                            <i class="fas fa-crown text-brand-400"></i>
+                            مستوى: ذهبي
+                        </h2>
+                    </div>
+                    <div class="text-center bg-brand-400 text-dark-900 rounded-2xl p-3 min-w-[80px]">
+                        <div class="text-2xl font-black" id="quickPoints">125</div>
+                        <div class="text-xs font-bold">نقطة</div>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="showReorder()" class="flex-1 bg-brand-400 text-dark-900 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2">
+                        <i class="fas fa-redo"></i> إعادة طلبي المعتاد
+                    </button>
+                    <button onclick="showSubscriptions()" class="flex-1 bg-dark-800 text-brand-400 border-2 border-brand-400 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2">
+                        <i class="fas fa-coffee"></i> اشتراكي
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- اختيار نوع الطلب (توصيل أو استلام) -->
+        <div class="bg-white rounded-2xl p-4 shadow-lg mb-6 border-2 border-brand-200">
+            <h3 class="text-lg font-black text-dark-900 mb-4 text-center">كيف تريد استلام طلبك؟</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="selectOrderType('delivery')" id="btn-delivery" class="p-4 rounded-xl border-2 border-gray-200 hover:border-delivery-500 transition group text-center">
+                    <div class="w-16 h-16 bg-delivery-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-delivery-500 transition">
+                        <i class="fas fa-motorcycle text-2xl text-delivery-500 group-hover:text-white transition"></i>
+                    </div>
+                    <div class="font-black text-lg text-dark-900">توصيل</div>
+                    <div class="text-sm text-gray-500">نوصل لباب بيتك</div>
+                    <div class="text-xs text-delivery-500 font-bold mt-1">رسوم التوصيل: 1 ر.ع</div>
+                </button>
+                <button onclick="selectOrderType('pickup')" id="btn-pickup" class="p-4 rounded-xl border-2 border-brand-400 bg-brand-50 transition group text-center">
+                    <div class="w-16 h-16 bg-brand-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-store text-2xl text-dark-900"></i>
+                    </div>
+                    <div class="font-black text-lg text-dark-900">استلام من الفرع</div>
+                    <div class="text-sm text-gray-500">الخابورة - السرحات</div>
+                    <div class="text-xs text-brand-600 font-bold mt-1">مجاني</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- معلومات التوصيل (تظهر عند اختيار التوصيل) -->
+        <div id="delivery-info" class="hidden mb-6">
+            <!-- عنوان التوصيل -->
+            <div class="bg-white rounded-2xl p-5 shadow-lg mb-4 border-2 border-delivery-200">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-black text-dark-900"><i class="fas fa-map-marker-alt text-delivery-500 ml-2"></i> عنوان التوصيل</h3>
+                    <button onclick="addNewAddress()" class="text-sm text-delivery-500 font-bold hover:underline">+ إضافة عنوان</button>
+                </div>
+                
+                <!-- قائمة العناوين المحفوظة -->
+                <div id="saved-addresses" class="space-y-3 mb-4">
+                    <div class="address-card selected p-4 bg-gray-50 rounded-xl cursor-pointer" onclick="selectAddress(this)">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="font-bold text-dark-900 flex items-center gap-2">
+                                    <i class="fas fa-home text-brand-500"></i> المنزل
+                                    <span class="bg-brand-400 text-dark-900 text-xs px-2 py-1 rounded-full">افتراضي</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1">منطقة السرحات، الخابورة، شمال الباطنة</p>
+                                <p class="text-xs text-gray-500 mt-1">معلم: مقابل مسجد السرحات</p>
+                            </div>
+                            <button class="text-gray-400 hover:text-dark-900"><i class="fas fa-ellipsis-v"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- خريطة منطقة التوصيل -->
+                <div class="bg-gray-100 rounded-xl p-4 text-center">
+                    <div class="flex items-center justify-center gap-2 mb-2 text-delivery-500">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="font-bold">نطاق التوصيل</span>
+                    </div>
+                    <p class="text-sm text-gray-600">نغطي الخابورة والمناطق المجاورة (5 كم)</p>
+                    <div class="mt-3 flex justify-center gap-4 text-xs">
+                        <span class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-delivery-500"></div> منطقة التوصيل</span>
+                        <span class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-brand-400"></div> المقهى</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- وقت التوصيل المتوقع -->
+            <div class="bg-delivery-50 rounded-2xl p-4 border-2 border-delivery-200">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-delivery-500 rounded-full flex items-center justify-center text-white">
+                        <i class="fas fa-clock text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-dark-900">وقت التوصيل المتوقع</div>
+                        <div class="text-2xl font-black text-delivery-500">30-45 دقيقة</div>
+                        <div class="text-xs text-gray-500">حسب حركة المرور والطلبات</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- معلومات الاستلام (تظهر دائماً) -->
+        <div id="pickup-info" class="mb-6">
+            <div class="bg-brand-50 rounded-2xl p-5 shadow-lg border-2 border-brand-200">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-brand-400 rounded-full flex items-center justify-center text-dark-900">
+                        <i class="fas fa-store text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-dark-900">الاستلام من الفرع</div>
+                        <div class="text-sm text-gray-600">الخابورة - منطقة السرحات - مقابل مركز الشرطة</div>
+                    </div>
+                </div>
+                
+                <!-- حالة الازدحام -->
+                <div class="bg-white rounded-xl p-3 mb-3 flex justify-between items-center">
+                    <span class="text-sm font-bold text-gray-600">الانشغال حالياً:</span>
+                    <span class="px-3 py-1 bg-green-100 text-green-600 rounded-full text-sm font-bold flex items-center gap-1">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> خفيف
+                    </span>
+                </div>
+
+                <!-- وقت الانتظار -->
+                <div class="bg-white rounded-xl p-3 flex justify-between items-center">
+                    <span class="text-sm font-bold text-gray-600">وقت التحضير:</span>
+                    <span class="text-brand-600 font-black">10-15 دقيقة</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- زر الموقع السريع -->
+        <a href="https://maps.app.goo.gl/B9UhsSuXoiWzTBjd8" target="_blank" class="block bg-oman-green text-white p-4 rounded-2xl mb-6 shadow-lg hover:bg-oman-green/90 transition group">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition">
+                        <i class="fas fa-map-marked-alt text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-lg">موقعنا على الخريطة</h3>
+                        <p class="text-sm opacity-90">الخابورة - مقابل مركز الشرطة - اضغط للتوجيه</p>
+                    </div>
+                </div>
+                <i class="fas fa-external-link-alt text-xl opacity-70"></i>
+            </div>
+        </a>
+
+        <!-- أزرار التنقل السريع -->
+        <div class="grid grid-cols-4 gap-3 mb-8">
+            <button onclick="scrollToSection('menu')" class="flex flex-col items-center gap-2 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-brand-400 transition group">
+                <div class="w-14 h-14 bg-brand-100 rounded-full flex items-center justify-center text-brand-600 group-hover:bg-brand-400 group-hover:text-dark-900 transition">
+                    <i class="fas fa-mug-hot text-2xl"></i>
+                </div>
+                <span class="text-xs font-bold text-dark-900">المنيو</span>
+            </button>
+            <button onclick="openBoxBuilder()" class="flex flex-col items-center gap-2 p-4 bg-brand-400 rounded-2xl shadow-lg border-2 border-dark-900 relative group hover:scale-105 transition">
+                <div class="w-14 h-14 bg-dark-900 rounded-full flex items-center justify-center text-brand-400">
+                    <i class="fas fa-box-open text-2xl"></i>
+                </div>
+                <span class="text-xs font-black text-dark-900">كوّن بوكسك</span>
+                <span class="absolute -top-2 -right-2 bg-oman-red text-white text-[10px] px-2 py-1 rounded-full font-bold animate-bounce">جديد</span>
+            </button>
+            <button onclick="showBundles()" class="flex flex-col items-center gap-2 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-brand-400 transition group">
+                <div class="w-14 h-14 bg-brand-100 rounded-full flex items-center justify-center text-brand-600 group-hover:bg-brand-400 group-hover:text-dark-900 transition">
+                    <i class="fas fa-gift text-2xl"></i>
+                </div>
+                <span class="text-xs font-bold text-dark-900">باقات</span>
+            </button>
+            <button onclick="showGifting()" class="flex flex-col items-center gap-2 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-brand-400 transition group">
+                <div class="w-14 h-14 bg-brand-100 rounded-full flex items-center justify-center text-brand-600 group-hover:bg-brand-400 group-hover:text-dark-900 transition">
+                    <i class="fas fa-heart text-2xl"></i>
+                </div>
+                <span class="text-xs font-bold text-dark-900">إهداء</span>
+            </button>
+        </div>
+
+        <!-- قسم المنيو الكامل -->
+        <section id="menu" class="mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-black text-dark-900 border-r-4 border-brand-400 pr-3">المنيو</h3>
+            </div>
+            
+            <!-- فئات المنيو -->
+            <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-2 mb-4">
+                <button onclick="filterMenu('all')" class="filter-btn px-4 py-2 bg-dark-900 text-brand-400 rounded-full text-sm font-bold border-2 border-brand-400 whitespace-nowrap" data-filter="all">الكل</button>
+                <button onclick="filterMenu('karak')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="karak">☕ الكرك</button>
+                <button onclick="filterMenu('tea')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="tea">🍵 الشاي</button>
+                <button onclick="filterMenu('coffee')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="coffee">☕ القهوة</button>
+                <button onclick="filterMenu('milk')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="milk">🥛 الحليب</button>
+                <button onclick="filterMenu('bread')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="bread">🫓 الخبز</button>
+                <button onclick="filterMenu('croissant')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="croissant">🥐 الكرواسان</button>
+                <button onclick="filterMenu('salalah')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="salalah">🍞 فطيرة صلالة</button>
+                <button onclick="filterMenu('paratha')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="paratha">🥞 البراتا</button>
+                <button onclick="filterMenu('toast')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="toast">🍞 التوست</button>
+                <button onclick="filterMenu('sandwich')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="sandwich">🥪 السندوتشات</button>
+                <button onclick="filterMenu('fatayer')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="fatayer">🥧 الفطاير</button>
+                <button onclick="filterMenu('club')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="club">🥪 الكلوب</button>
+                <button onclick="filterMenu('burger')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="burger">🍔 البرجر</button>
+                <button onclick="filterMenu('samun')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="samun">🥖 الصمون</button>
+                <button onclick="filterMenu('special')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="special">⭐ وجبات مميزة</button>
+                <button onclick="filterMenu('luqaimat')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="luqaimat">🍩 اللقيمات</button>
+                <button onclick="filterMenu('mojito')" class="filter-btn px-4 py-2 bg-white text-dark-900 rounded-full text-sm font-bold border border-gray-200 whitespace-nowrap" data-filter="mojito">🍹 موهيتو</button>
+            </div>
+
+            <div class="grid gap-3" id="menuGrid"></div>
+        </section>
+
+        <!-- قسم الباقات -->
+        <section id="bundles" class="mb-8 hidden">
+            <h3 class="text-2xl font-black text-dark-900 border-r-4 border-brand-400 pr-3 mb-6">الباقات المخفضة</h3>
+            <div class="space-y-4" id="bundlesList"></div>
+        </section>
+
+        <!-- خريطة الموقع -->
+        <section class="mb-8">
+            <h3 class="text-2xl font-black text-dark-900 border-r-4 border-brand-400 pr-3 mb-4">موقعنا</h3>
+            <div class="map-container h-64 w-full border-2 border-brand-400 shadow-lg rounded-2xl overflow-hidden">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3656.1234567890123!2d56.12345678901234!3d23.123456789012345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDA3JzI0LjQiTiA1NsKwMDcnMjQuNCJF!5e0!3m2!1sen!2som!4v1234567890123!5m2!1sen!2som" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+            <div class="mt-4 flex gap-3">
+                <a href="https://maps.app.goo.gl/B9UhsSuXoiWzTBjd8" target="_blank" class="flex-1 btn-gold py-3 rounded-xl font-bold text-center flex items-center justify-center gap-2">
+                    <i class="fas fa-directions"></i> فتح في خرائط Google
+                </a>
+                <button onclick="copyLocation()" class="px-4 py-3 bg-dark-900 text-brand-400 rounded-xl font-bold hover:bg-dark-800 transition">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- معلومات التواصل -->
+        <section class="bg-dark-900 text-brand-400 p-6 rounded-3xl mb-8">
+            <h3 class="text-xl font-black mb-4 text-center">تواصل معنا</h3>
+            <div class="space-y-3 text-center">
+                <a href="tel:77055754" class="flex items-center justify-center gap-3 bg-brand-400 text-dark-900 py-3 rounded-xl font-bold hover:bg-brand-300 transition">
+                    <i class="fas fa-phone"></i> 77055754
+                </a>
+                <a href="tel:96959420" class="flex items-center justify-center gap-3 bg-white text-dark-900 py-3 rounded-xl font-bold hover:bg-gray-100 transition">
+                    <i class="fas fa-mobile-alt"></i> 96959420
+                </a>
+                <div class="mt-4 pt-4 border-t border-brand-600">
+                    <p class="text-sm opacity-80 mb-2">الموقع:</p>
+                    <p class="font-bold">سلطنة عمان - شمال الباطنة</p>
+                    <p class="font-bold">ولاية الخابورة - منطقة السرحات</p>
+                    <p class="text-sm mt-1">مقابل مركز الشرطة</p>
+                    <a href="https://maps.app.goo.gl/B9UhsSuXoiWzTBjd8" target="_blank" class="inline-flex items-center gap-2 mt-3 text-brand-400 hover:text-white transition">
+                        <i class="fas fa-map-marker-alt"></i> عرض على الخريطة
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- شريط الطلب السفلي -->
+    <div class="fixed bottom-0 w-full bg-white border-t-2 border-brand-400 shadow-lg z-40 p-4">
+        <div class="container mx-auto max-w-2xl">
+            <!-- ملخص الطلب -->
+            <div id="order-summary-mini" class="flex justify-between items-center mb-3 pb-3 border-b border-gray-200 hidden">
+                <div class="text-sm">
+                    <span class="text-gray-600" id="order-type-label">استلام من الفرع</span>
+                    <span class="mx-2 text-gray-300">|</span>
+                    <span class="font-bold text-dark-900" id="delivery-fee">مجاني</span>
+                </div>
+                <button onclick="changeOrderType()" class="text-sm text-brand-600 font-bold hover:underline">تغيير</button>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="openCheckout()" class="flex-1 btn-gold py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-3">
+                    <span>اطلب الآن</span>
+                    <span class="bg-dark-900 text-brand-400 px-4 py-1 rounded-lg text-base" id="totalAmount">٠ ر.ع</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= نوافذ منبثقة ================= -->
+
+    <!-- نافذة السلة -->
+    <div id="cartModal" class="fixed inset-0 bg-dark-900/80 z-50 hidden flex items-end sm:items-center justify-center backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 slide-up max-h-[85vh] overflow-y-auto border-t-4 border-brand-400">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-black text-dark-900">سلة التسوق</h3>
+                <button onclick="toggleCart()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-red-100 hover:text-red-600 transition">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="cartItems" class="space-y-3 mb-6"></div>
+            
+            <!-- ملخص التكاليف -->
+            <div class="border-t-2 border-brand-200 pt-4 space-y-3 bg-brand-50 p-4 rounded-2xl mb-4">
+                <div class="flex justify-between text-sm text-dark-700"><span>المجموع</span><span id="cartSubtotal">٠ ر.ع</span></div>
+                <div class="flex justify-between text-sm text-dark-600"><span>الضريبة (5%)</span><span id="cartTax">٠ ر.ع</span></div>
+                <div id="delivery-fee-row" class="flex justify-between text-sm text-delivery-600 hidden">
+                    <span>رسوم التوصيل</span><span>1.000 ر.ع</span>
+                </div>
+                <div class="flex justify-between font-black text-xl text-dark-900 border-t border-brand-300 pt-2">
+                    <span>الإجمالي</span><span id="cartTotal">٠ ر.ع</span>
+                </div>
+            </div>
+            
+            <!-- ملاحظات الطلب -->
+            <div class="mb-4">
+                <label class="block text-sm font-bold text-dark-900 mb-2">ملاحظات الطلب (اختياري)</label>
+                <textarea id="orderNotes" placeholder="مثال: بدون سكر، حار جداً..." class="w-full p-3 border-2 border-gray-200 rounded-xl text-sm focus:border-brand-400 focus:outline-none resize-none h-20"></textarea>
+            </div>
+            
+            <button onclick="openCheckout()" class="w-full btn-dark py-4 rounded-2xl font-bold text-lg">متابعة للدفع</button>
+        </div>
+    </div>
+
+    <!-- نافذة إتمام الطلب (Checkout) -->
+    <div id="checkoutModal" class="fixed inset-0 bg-dark-900/90 z-50 hidden flex items-end sm:items-center justify-center backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 slide-up max-h-[90vh] overflow-y-auto">
+            <!-- خطوات التقدم -->
+            <div class="flex justify-between items-center mb-6 relative">
+                <div class="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -z-10 transform -translate-y-1/2"></div>
+                <div class="progress-step active w-10 h-10 rounded-full bg-brand-400 text-dark-900 flex items-center justify-center font-bold text-sm">1</div>
+                <div class="progress-step w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-sm">2</div>
+                <div class="progress-step w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-sm">3</div>
+            </div>
+
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-black text-dark-900">إتمام الطلب</h3>
+                <button onclick="closeCheckout()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-red-100 hover:text-red-600 transition">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- تفاصيل الطلب -->
+            <div class="bg-gray-50 rounded-2xl p-4 mb-4">
+                <div class="flex items-center gap-3 mb-3 pb-3 border-b border-gray-200">
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center" id="checkout-icon-bg">
+                        <i class="fas fa-store text-xl" id="checkout-icon"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-dark-900" id="checkout-type">استلام من الفرع</div>
+                        <div class="text-sm text-gray-500" id="checkout-address">الخابورة - السرحات</div>
+                    </div>
+                </div>
+                
+                <!-- وقت التسليم -->
+                <div class="mb-3">
+                    <label class="block text-sm font-bold text-dark-900 mb-2">وقت التسليم</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="selectDeliveryTime('asap')" class="delivery-time-btn p-3 border-2 border-brand-400 bg-brand-50 rounded-xl text-center font-bold text-sm" data-time="asap">
+                            <i class="fas fa-bolt text-brand-500 mb-1 block"></i> في أقرب وقت
+                        </button>
+                        <button onclick="selectDeliveryTime('scheduled')" class="delivery-time-btn p-3 border-2 border-gray-200 rounded-xl text-center font-bold text-sm text-gray-600" data-time="scheduled">
+                            <i class="fas fa-clock text-gray-400 mb-1 block"></i> جدولة
+                        </button>
+                    </div>
+                </div>
+
+                <!-- جدولة الوقت (تظهر عند الاختيار) -->
+                <div id="scheduled-time-selector" class="hidden mt-3">
+                    <select class="w-full p-3 border-2 border-gray-200 rounded-xl text-sm focus:border-brand-400 focus:outline-none">
+                        <option>اليوم - 12:00 مساءً</option>
+                        <option>اليوم - 12:30 مساءً</option>
+                        <option>اليوم - 01:00 مساءً</option>
+                        <option>اليوم - 01:30 مساءً</option>
+                        <option>اليوم - 02:00 مساءً</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- ملخص الطلب -->
+            <div class="bg-brand-50 rounded-2xl p-4 mb-4 border-2 border-brand-200">
+                <h4 class="font-bold text-dark-900 mb-3">ملخص الطلب</h4>
+                <div id="checkout-items" class="space-y-2 text-sm mb-3 max-h-32 overflow-y-auto"></div>
+                <div class="border-t border-brand-200 pt-2 space-y-1">
+                    <div class="flex justify-between text-sm"><span>المجموع</span><span id="checkout-subtotal">٠ ر.ع</span></div>
+                    <div class="flex justify-between text-sm"><span>الضريبة</span><span id="checkout-tax">٠ ر.ع</span></div>
+                    <div id="checkout-delivery-fee" class="flex justify-between text-sm hidden"><span>التوصيل</span><span>1.000 ر.ع</span></div>
+                    <div class="flex justify-between font-black text-lg text-dark-900 pt-1 border-t border-brand-300">
+                        <span>الإجمالي</span><span id="checkout-total">٠ ر.ع</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- طرق الدفع -->
+            <div class="mb-4">
+                <h4 class="font-bold text-dark-900 mb-3">طريقة الدفع</h4>
+                <div class="space-y-2">
+                    <label class="flex items-center gap-3 p-4 border-2 border-brand-400 bg-brand-50 rounded-xl cursor-pointer">
+                        <input type="radio" name="payment" value="cod" checked class="w-5 h-5 text-brand-500" onchange="selectPaymentMethod('cod')">
+                        <div class="flex-1">
+                            <div class="font-bold text-dark-900">الدفع عند الاستلام</div>
+                            <div class="text-xs text-gray-500">نقداً أو بطاقة</div>
+                        </div>
+                        <i class="fas fa-money-bill-wave text-brand-500 text-xl"></i>
+                    </label>
+                    <label class="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-brand-400 transition">
+                        <input type="radio" name="payment" value="bank" class="w-5 h-5 text-brand-500" onchange="selectPaymentMethod('bank')">
+                        <div class="flex-1">
+                            <div class="font-bold text-dark-900">تحويل بنكي</div>
+                            <div class="text-xs text-gray-500">بنك مسقط - 96959420</div>
+                        </div>
+                        <i class="fas fa-university text-oman-green text-xl"></i>
+                    </label>
+                </div>
+            </div>
+
+            <!-- باركود التحويل -->
+            <div id="checkout-bank-qr" class="hidden bg-brand-50 rounded-2xl p-4 mb-4 text-center border-2 border-brand-200">
+                <p class="font-bold text-dark-900 mb-2">امسح للتحويل السريع</p>
+                <img src="/mnt/kimi/upload/709CD6D6-A405-4A39-8127-63C4C558777E.jpg" alt="باركود" class="w-32 h-32 mx-auto object-contain mb-2">
+                <p class="text-sm text-brand-600 font-bold">96959420</p>
+            </div>
+
+            <!-- زر إتمام الطلب -->
+            <button onclick="placeOrder()" class="w-full btn-gold py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-2">
+                <i class="fas fa-check-circle"></i> تأكيد الطلب
+            </button>
+        </div>
+    </div>
+
+    <!-- نافذة تتبع الطلب -->
+    <div id="trackingModal" class="fixed inset-0 bg-dark-900/90 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md rounded-3xl p-6 max-h-[90vh] overflow-y-auto">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 bg-brand-400 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                    <i class="fas fa-check text-4xl text-dark-900"></i>
+                </div>
+                <h3 class="text-2xl font-black text-dark-900">تم تأكيد طلبك!</h3>
+                <p class="text-gray-500">رقم الطلب: <span class="font-bold text-dark-900">#12345</span></p>
+            </div>
+
+            <!-- شريط التتبع -->
+            <div class="relative mb-8">
+                <div class="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -z-10 transform -translate-y-1/2"></div>
+                <div class="flex justify-between">
+                    <div class="tracking-step text-center">
+                        <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white mx-auto mb-2">
+                            <i class="fas fa-check text-sm"></i>
+                        </div>
+                        <div class="text-xs font-bold text-dark-900">تم الاستلام</div>
+                    </div>
+                    <div class="tracking-step text-center">
+                        <div class="w-10 h-10 bg-brand-400 rounded-full flex items-center justify-center text-dark-900 mx-auto mb-2 animate-pulse">
+                            <i class="fas fa-fire text-sm"></i>
+                        </div>
+                        <div class="text-xs font-bold text-dark-900">جاري التحضير</div>
+                    </div>
+                    <div class="tracking-step text-center">
+                        <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 mx-auto mb-2">
+                            <i class="fas fa-box text-sm"></i>
+                        </div>
+                        <div class="text-xs text-gray-500">جاهز</div>
+                    </div>
+                    <div class="tracking-step text-center">
+                        <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 mx-auto mb-2">
+                            <i class="fas fa-motorcycle text-sm"></i>
+                        </div>
+                        <div class="text-xs text-gray-500">في الطريق</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- تفاصيل التسليم -->
+            <div class="bg-brand-50 rounded-2xl p-4 mb-4 border-2 border-brand-200">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-12 h-12 bg-brand-400 rounded-full flex items-center justify-center text-dark-900">
+                        <i class="fas fa-clock text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-dark-900">الوقت المتوقع</div>
+                        <div class="text-2xl font-black text-brand-600" id="tracking-time">25 دقيقة</div>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-600 bg-white p-3 rounded-xl">
+                    <i class="fas fa-info-circle text-brand-500 ml-2"></i>
+                    <span id="tracking-message">طلبك قيد التحضير الآن في فرع الخابورة</span>
+                </div>
+            </div>
+
+            <!-- معلومات المندوب (للتوصيل) -->
+            <div id="driver-info" class="hidden bg-gray-50 rounded-2xl p-4 mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-14 h-14 bg-gray-300 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-2xl text-gray-500"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-bold text-dark-900">محمد - مندوب التوصيل</div>
+                        <div class="text-sm text-gray-500">+968 9123 4567</div>
+                        <div class="flex items-center gap-1 text-xs text-green-600 mt-1">
+                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> متصل الآن
+                        </div>
+                    </div>
+                    <a href="tel:91234567" class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white hover:bg-green-600 transition">
+                        <i class="fas fa-phone"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- أزرار -->
+            <div class="space-y-3">
+                <button onclick="closeTracking()" class="w-full btn-dark py-3 rounded-xl font-bold">متابعة التسوق</button>
+                <a href="https://wa.me/96877055754" target="_blank" class="block w-full bg-green-500 text-white py-3 rounded-xl font-bold text-center hover:bg-green-600 transition">
+                    <i class="fab fa-whatsapp ml-2"></i> تواصل عبر واتساب
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة عنوان جديد -->
+    <div id="newAddressModal" class="fixed inset-0 bg-dark-900/90 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md rounded-3xl p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-black text-dark-900">إضافة عنوان جديد</h3>
+                <button onclick="document.getElementById('newAddressModal').classList.add('hidden')" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-dark-900 mb-2">اسم العنوان</label>
+                    <input type="text" id="address-name" placeholder="مثال: المنزل، العمل" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-brand-400 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-dark-900 mb-2">المنطقة / الحي</label>
+                    <input type="text" id="address-area" placeholder="مثال: منطقة السرحات" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-brand-400 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-dark-900 mb-2">الوصف / المعلم</label>
+                    <textarea id="address-landmark" placeholder="مثال: مقابل مسجد السرحات، بجانب محل..." class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-brand-400 focus:outline-none resize-none h-24"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-dark-900 mb-2">رقم الهاتف</label>
+                    <input type="tel" id="address-phone" placeholder="91234567" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-brand-400 focus:outline-none text-left" dir="ltr">
+                </div>
+                
+                <button onclick="saveNewAddress()" class="w-full btn-gold py-4 rounded-xl font-bold text-lg">حفظ العنوان</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- باقي النوافذ... -->
+    <!-- [نفس النوافذ السابقة: البوكس، الجدولة، الدفع، وصول، تسجيل دخول] -->
+
+    <script>
+        // ===== المتغيرات العامة =====
+        let orderType = 'pickup'; // 'pickup' أو 'delivery'
+        let deliveryFee = 1.000;
+        let selectedAddress = null;
+        
+        // ===== اختيار نوع الطلب =====
+        function selectOrderType(type) {
+            orderType = type;
+            
+            // تحديث الأزرار
+            document.getElementById('btn-delivery').classList.remove('border-delivery-500', 'bg-delivery-50');
+            document.getElementById('btn-pickup').classList.remove('border-brand-400', 'bg-brand-50');
+            document.getElementById('btn-delivery').classList.add('border-gray-200');
+            document.getElementById('btn-pickup').classList.add('border-gray-200');
+            
+            if (type === 'delivery') {
+                document.getElementById('btn-delivery').classList.remove('border-gray-200');
+                document.getElementById('btn-delivery').classList.add('border-delivery-500', 'bg-delivery-50');
+                document.getElementById('delivery-info').classList.remove('hidden');
+                document.getElementById('pickup-info').classList.add('hidden');
+                document.getElementById('order-summary-mini').classList.remove('hidden');
+                document.getElementById('order-type-label').textContent = 'توصيل للمنزل';
+                document.getElementById('delivery-fee').textContent = '1.000 ر.ع';
+                document.getElementById('delivery-fee-row').classList.remove('hidden');
+                document.getElementById('checkout-delivery-fee').classList.remove('hidden');
+                document.getElementById('driver-info').classList.remove('hidden');
+                document.getElementById('tracking-time').textContent = '35-45 دقيقة';
+                document.getElementById('tracking-message').textContent = 'سيتم توصيل طلبك بواسطة مندوبنا';
+            } else {
+                document.getElementById('btn-pickup').classList.remove('border-gray-200');
+                document.getElementById('btn-pickup').classList.add('border-brand-400', 'bg-brand-50');
+                document.getElementById('delivery-info').classList.add('hidden');
+                document.getElementById('pickup-info').classList.remove('hidden');
+                document.getElementById('order-summary-mini').classList.remove('hidden');
+                document.getElementById('order-type-label').textContent = 'استلام من الفرع';
+                document.getElementById('delivery-fee').textContent = 'مجاني';
+                document.getElementById('delivery-fee-row').classList.add('hidden');
+                document.getElementById('checkout-delivery-fee').classList.add('hidden');
+                document.getElementById('driver-info').classList.add('hidden');
+                document.getElementById('tracking-time').textContent = '15-20 دقيقة';
+                document.getElementById('tracking-message').textContent = 'طلبك قيد التحضير الآن في فرع الخابورة';
+            }
+            
+            updateCartUI();
+        }
+
+        function changeOrderType() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ===== إدارة العناوين =====
+        function addNewAddress() {
+            document.getElementById('newAddressModal').classList.remove('hidden');
+        }
+
+        function saveNewAddress() {
+            const name = document.getElementById('address-name').value;
+            const area = document.getElementById('address-area').value;
+            const landmark = document.getElementById('address-landmark').value;
+            
+            if (!name || !area) {
+                showToast('الرجاء إدخال الاسم والمنطقة');
+                return;
+            }
+            
+            const container = document.getElementById('saved-addresses');
+            const newCard = document.createElement('div');
+            newCard.className = 'address-card p-4 bg-gray-50 rounded-xl cursor-pointer mb-2';
+            newCard.onclick = function() { selectAddress(this); };
+            newCard.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="font-bold text-dark-900 flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-delivery-500"></i> ${name}
+                        </div>
+                        <p class="text-sm text-gray-600 mt-1">${area}</p>
+                        <p class="text-xs text-gray-500 mt-1">معلم: ${landmark}</p>
+                    </div>
+                    <button class="text-gray-400 hover:text-dark-900"><i class="fas fa-ellipsis-v"></i></button>
+                </div>
+            `;
+            
+            container.appendChild(newCard);
+            document.getElementById('newAddressModal').classList.add('hidden');
+            showToast('تم إضافة العنوان بنجاح');
+            
+            // إعادة تعيين الحقول
+            document.getElementById('address-name').value = '';
+            document.getElementById('address-area').value = '';
+            document.getElementById('address-landmark').value = '';
+            document.getElementById('address-phone').value = '';
+        }
+
+        function selectAddress(card) {
+            document.querySelectorAll('.address-card').forEach(c => {
+                c.classList.remove('selected', 'bg-green-50', 'border-green-500');
+                c.classList.add('bg-gray-50');
+            });
+            card.classList.add('selected', 'bg-green-50');
+            card.classList.remove('bg-gray-50');
+        }
+
+        // ===== Checkout =====
+        function openCheckout() {
+            if (cart.length === 0) {
+                showToast('السلة فارغة');
+                return;
+            }
+            
+            document.getElementById('cartModal').classList.add('hidden');
+            document.getElementById('checkoutModal').classList.remove('hidden');
+            
+            // تحديث ملخص الطلب
+            const container = document.getElementById('checkout-items');
+            container.innerHTML = cart.map(item => `
+                <div class="flex justify-between">
+                    <span>${item.name} ×${item.quantity}</span>
+                    <span class="font-bold">${(item.price * item.quantity).toFixed(3)} ر.ع</span>
+                </div>
+            `).join('');
+            
+            // تحديث الأيقونة والعنوان
+            const iconBg = document.getElementById('checkout-icon-bg');
+            const icon = document.getElementById('checkout-icon');
+            const typeLabel = document.getElementById('checkout-type');
+            const addressLabel = document.getElementById('checkout-address');
+            
+            if (orderType === 'delivery') {
+                iconBg.className = 'w-12 h-12 bg-delivery-500 rounded-full flex items-center justify-center text-white';
+                icon.className = 'fas fa-motorcycle text-xl';
+                typeLabel.textContent = 'توصيل للمنزل';
+                addressLabel.textContent = 'منطقة السرحات، الخابورة';
+            } else {
+                iconBg.className = 'w-12 h-12 bg-brand-400 rounded-full flex items-center justify-center text-dark-900';
+                icon.className = 'fas fa-store text-xl';
+                typeLabel.textContent = 'استلام من الفرع';
+                addressLabel.textContent = 'الخابورة - السرحات - مقابل مركز الشرطة';
+            }
+            
+            updateCheckoutTotals();
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+        }
+
+        function updateCheckoutTotals() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const tax = subtotal * 0.05;
+            const total = subtotal + tax + (orderType === 'delivery' ? deliveryFee : 0);
+            
+            document.getElementById('checkout-subtotal').textContent = subtotal.toFixed(3) + ' ر.ع';
+            document.getElementById('checkout-tax').textContent = tax.toFixed(3) + ' ر.ع';
+            document.getElementById('checkout-total').textContent = total.toFixed(3) + ' ر.ع';
+        }
+
+        function selectDeliveryTime(type) {
+            document.querySelectorAll('.delivery-time-btn').forEach(btn => {
+                btn.classList.remove('border-brand-400', 'bg-brand-50', 'text-dark-900');
+                btn.classList.add('border-gray-200', 'text-gray-600');
+            });
+            
+            event.currentTarget.classList.remove('border-gray-200', 'text-gray-600');
+            event.currentTarget.classList.add('border-brand-400', 'bg-brand-50', 'text-dark-900');
+            
+            if (type === 'scheduled') {
+                document.getElementById('scheduled-time-selector').classList.remove('hidden');
+            } else {
+                document.getElementById('scheduled-time-selector').classList.add('hidden');
+            }
+        }
+
+        function selectPaymentMethod(method) {
+            if (method === 'bank') {
+                document.getElementById('checkout-bank-qr').classList.remove('hidden');
+            } else {
+                document.getElementById('checkout-bank-qr').classList.add('hidden');
+            }
+        }
+
+        function placeOrder() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+            document.getElementById('trackingModal').classList.remove('hidden');
+            
+            // محاكاة تحديث حالة الطلب
+            setTimeout(() => {
+                showToast('طلبك جاهز للاستلام!');
+            }, 5000);
+        }
+
+        function closeTracking() {
+            document.getElementById('trackingModal').classList.add('hidden');
+            cart = [];
+            updateCartUI();
+        }
+
+        // ===== باقي الدوال... =====
+        // [نفس دوال المنيو والسلة والبوكس من الكود السابق]
+
+        // تهيئة
+        document.addEventListener('DOMContentLoaded', () => {
+            selectOrderType('pickup'); // الافتراضي استلام
+        });
+    </script>
+</body>
+</html>
